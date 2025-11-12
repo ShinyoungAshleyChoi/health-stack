@@ -27,9 +27,6 @@ class NetworkClient: NSObject {
         headers: [String: String]?,
         responseType: R.Type
     ) async throws -> R {
-        // Validate HTTPS
-        try validateHTTPS(url: url)
-        
         // Create request
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
@@ -68,9 +65,6 @@ class NetworkClient: NSObject {
         body: T?,
         headers: [String: String]?
     ) async throws {
-        // Validate HTTPS
-        try validateHTTPS(url: url)
-        
         // Create request
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
@@ -98,8 +92,6 @@ class NetworkClient: NSObject {
     }
     
     func testConnection(url: URL, headers: [String: String]?) async throws {
-        try validateHTTPS(url: url)
-        
         var request = URLRequest(url: url)
         request.httpMethod = HTTPMethod.get.rawValue
         request.timeoutInterval = timeout
@@ -122,12 +114,6 @@ class NetworkClient: NSObject {
     }
     
     // MARK: - Private Methods
-    
-    private func validateHTTPS(url: URL) throws {
-        guard url.scheme?.lowercased() == "https" else {
-            throw GatewayError.insecureConnection
-        }
-    }
     
     private func validateResponse(response: URLResponse, data: Data) throws {
         guard let httpResponse = response as? HTTPURLResponse else {

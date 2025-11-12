@@ -30,7 +30,6 @@ class GatewayService: GatewayServiceProtocol {
     
     func configure(config: GatewayConfig) throws {
         try config.validate()
-        try validateSecureConnectionForConfig(config)
         self.config = config
         logger.info("Gateway service configured with URL: \(config.baseURL)")
     }
@@ -39,8 +38,6 @@ class GatewayService: GatewayServiceProtocol {
         guard let config = config else {
             throw GatewayError.invalidConfiguration
         }
-        
-        try validateSecureConnection()
         
         // Split data into batches
         let batches = data.chunked(into: maxBatchSize)
@@ -72,8 +69,6 @@ class GatewayService: GatewayServiceProtocol {
             throw GatewayError.invalidConfiguration
         }
         
-        try validateSecureConnection()
-        
         let url = buildURL(config: config, path: "/health")
         let headers = buildHeaders(config: config)
         
@@ -88,25 +83,18 @@ class GatewayService: GatewayServiceProtocol {
     }
     
     func validateSecureConnection() throws {
+        // No longer enforcing HTTPS - allow both HTTP and HTTPS
         guard let config = config else {
             throw GatewayError.invalidConfiguration
         }
         
-        try validateSecureConnectionForConfig(config)
+        // Just validate that URL is valid
+        guard URL(string: config.baseURL) != nil else {
+            throw GatewayError.invalidConfiguration
+        }
     }
     
     // MARK: - Private Methods
-    
-    private func validateSecureConnectionForConfig(_ config: GatewayConfig) throws {
-        // Validate URL format only (allow both HTTP and HTTPS for development)
-        guard let url = URL(string: config.baseURL) else {
-            throw GatewayError.invalidConfiguration
-        }
-        
-        guard url.scheme?.lowercased() == "http" || url.scheme?.lowercased() == "https" else {
-            throw GatewayError.invalidConfiguration
-        }
-    }
     
     private func sendBatchWithRetry(batch: [HealthDataSample], config: GatewayConfig) async throws -> SyncResponse {
         var lastError: Error?
@@ -119,7 +107,7 @@ class GatewayService: GatewayServiceProtocol {
                 
                 // Don't retry on authentication or configuration errors
                 switch error {
-                case .authenticationFailed, .invalidConfiguration, .insecureConnection:
+                case .authenticationFailed, .invalidConfiguration:
                     throw error
                 default:
                     break
