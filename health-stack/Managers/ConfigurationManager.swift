@@ -42,8 +42,8 @@ class ConfigurationManager: ConfigurationManagerProtocol {
     
     // Default gateway configuration
     private let defaultGatewayConfig = GatewayConfig(
-        baseURL: "https://localhost",
-        port: 8080,
+        baseURL: "https://192.168.45.185",
+        port: 3000,
         apiKey: "default-api-key",
         username: nil,
         password: nil

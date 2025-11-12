@@ -17,7 +17,7 @@ struct GatewayConfig: Codable {
         if let port = port {
             urlString += ":\(port)"
         }
-        return URL(string: urlString) ?? URL(string: "https://localhost")!
+        return URL(string: urlString) ?? URL(string: "https://192.168.45.185")!
     }
     
     func validate() throws {
