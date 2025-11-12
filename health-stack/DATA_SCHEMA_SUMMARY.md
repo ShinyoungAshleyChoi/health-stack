@@ -25,8 +25,8 @@ HealthDataPayload
 
 ### API 엔드포인트
 ```
-POST /health/data
-GET  /health (연결 테스트)
+POST /api/v1/health-data/ (데이터 전송)
+GET  /health              (연결 테스트)
 ```
 
 ### 인증

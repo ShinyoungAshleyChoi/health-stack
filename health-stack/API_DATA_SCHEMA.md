@@ -7,7 +7,7 @@ iOS 앱에서 게이트웨이로 전송하는 건강 데이터의 JSON 스키마
 
 ### Endpoint
 ```
-POST /health/data
+POST /api/v1/health-data/
 ```
 
 ### Headers

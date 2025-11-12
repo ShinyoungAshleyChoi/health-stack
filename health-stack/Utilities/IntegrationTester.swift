@@ -314,11 +314,20 @@ final class IntegrationTester: ObservableObject {
     func testHTTPSEnforcement() async {
         currentTest = "Testing HTTPS enforcement..."
         
+        // Save original configuration
+        let originalConfig = try? configManager.getGatewayConfig()
+        
         let result = await testHTTPRejection()
         testResults.append(result)
         
         let httpsResult = await testHTTPSAcceptance()
         testResults.append(httpsResult)
+        
+        // Restore original configuration
+        if let originalConfig = originalConfig {
+            try? configManager.saveGatewayConfig(originalConfig)
+            try? gatewayService.configure(config: originalConfig)
+        }
     }
     
     private func testHTTPRejection() async -> TestResult {
@@ -460,6 +469,9 @@ final class IntegrationTester: ObservableObject {
     private func testInvalidGateway() async -> TestResult {
         let start = Date()
         
+        // Save original configuration
+        let originalConfig = try? configManager.getGatewayConfig()
+        
         // Configure invalid gateway
         let invalidConfig = GatewayConfig(
             baseURL: "https://invalid-gateway-that-does-not-exist.example.com",
@@ -469,13 +481,15 @@ final class IntegrationTester: ObservableObject {
             password: nil
         )
         
+        let result: TestResult
+        
         do {
             try configManager.saveGatewayConfig(invalidConfig)
             try gatewayService.configure(config: invalidConfig)
             
             let connected = try await gatewayService.testConnection()
             
-            return TestResult(
+            result = TestResult(
                 name: "Invalid Gateway Handling",
                 category: .errorHandling,
                 status: connected ? .failed : .passed,
@@ -484,15 +498,23 @@ final class IntegrationTester: ObservableObject {
                 duration: Date().timeIntervalSince(start)
             )
         } catch {
-            return TestResult(
+            result = TestResult(
                 name: "Invalid Gateway Handling",
                 category: .errorHandling,
                 status: .passed,
-                message: "Configuration save failed as expected",
+                message: "Invalid gateway correctly rejected: \(error.localizedDescription)",
                 timestamp: Date(),
                 duration: Date().timeIntervalSince(start)
             )
         }
+        
+        // Restore original configuration
+        if let originalConfig = originalConfig {
+            try? configManager.saveGatewayConfig(originalConfig)
+            try? gatewayService.configure(config: originalConfig)
+        }
+        
+        return result
     }
     
     // MARK: - Permission Tests

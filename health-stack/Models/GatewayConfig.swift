@@ -17,15 +17,17 @@ struct GatewayConfig: Codable {
         if let port = port {
             urlString += ":\(port)"
         }
-        return URL(string: urlString) ?? URL(string: "https://192.168.45.185")!
+        return URL(string: urlString) ?? URL(string: "http://192.168.45.185")!
     }
     
     func validate() throws {
-        guard baseURL.lowercased().hasPrefix("https://") else {
-            throw GatewayError.insecureConnection
+        // Validate URL format only (allow both HTTP and HTTPS)
+        guard URL(string: baseURL) != nil else {
+            throw GatewayError.invalidConfiguration
         }
         
-        guard URL(string: baseURL) != nil else {
+        // Ensure URL has a scheme
+        guard baseURL.lowercased().hasPrefix("http://") || baseURL.lowercased().hasPrefix("https://") else {
             throw GatewayError.invalidConfiguration
         }
     }

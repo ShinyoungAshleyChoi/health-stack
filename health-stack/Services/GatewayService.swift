@@ -98,16 +98,13 @@ class GatewayService: GatewayServiceProtocol {
     // MARK: - Private Methods
     
     private func validateSecureConnectionForConfig(_ config: GatewayConfig) throws {
-        guard config.baseURL.lowercased().hasPrefix("https://") else {
-            throw GatewayError.insecureConnection
-        }
-        
+        // Validate URL format only (allow both HTTP and HTTPS for development)
         guard let url = URL(string: config.baseURL) else {
             throw GatewayError.invalidConfiguration
         }
         
-        guard url.scheme?.lowercased() == "https" else {
-            throw GatewayError.insecureConnection
+        guard url.scheme?.lowercased() == "http" || url.scheme?.lowercased() == "https" else {
+            throw GatewayError.invalidConfiguration
         }
     }
     
@@ -143,7 +140,7 @@ class GatewayService: GatewayServiceProtocol {
     }
     
     private func sendBatch(batch: [HealthDataSample], config: GatewayConfig) async throws -> SyncResponse {
-        let url = buildURL(config: config, path: "/health/data")
+        let url = buildURL(config: config, path: "/api/v1/health-data/")
         let headers = buildHeaders(config: config)
         
         // Get userId from configuration

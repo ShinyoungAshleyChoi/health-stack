@@ -7,7 +7,7 @@ iOS 앱에서 전송하는 건강 데이터를 받아 Kafka로 전달하는 게�
 
 ### 1. 건강 데이터 수신
 ```
-POST /health/data
+POST /api/v1/health-data/
 Content-Type: application/json
 X-API-Key: {apiKey}
 ```
@@ -79,7 +79,7 @@ app.get('/health', (req, res) => {
 });
 
 // 건강 데이터 수신
-app.post('/health/data', validateApiKey, async (req, res) => {
+app.post('/api/v1/health-data/', validateApiKey, async (req, res) => {
   try {
     const { deviceId, userId, samples, timestamp, appVersion } = req.body;
     
@@ -204,7 +204,7 @@ async def health_check():
     }
 
 # 건강 데이터 수신
-@app.post("/health/data", response_model=SyncResponse)
+@app.post("/api/v1/health-data/", response_model=SyncResponse)
 async def receive_health_data(
     payload: HealthDataPayload,
     x_api_key: str = Header(...)
@@ -384,7 +384,7 @@ const samplesReceived = new prometheus.Counter({
 curl https://gateway.example.com/health
 
 # 데이터 전송 테스트
-curl -X POST https://gateway.example.com/health/data \
+curl -X POST https://gateway.example.com/api/v1/health-data/ \
   -H "Content-Type: application/json" \
   -H "X-API-Key: your-api-key" \
   -d @sample-data.json
