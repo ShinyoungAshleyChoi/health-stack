@@ -6,17 +6,22 @@
 import Foundation
 
 struct SyncResponse: Codable {
-    let success: Bool
-    let syncedCount: Int
-    let failedCount: Int
-    let message: String?
-    let timestamp: Date
+    let status: String
+    let requestId: String?
+    let timestamp: String
+    let samplesReceived: Int
     
-    init(success: Bool, syncedCount: Int, failedCount: Int = 0, message: String? = nil, timestamp: Date = Date()) {
-        self.success = success
-        self.syncedCount = syncedCount
-        self.failedCount = failedCount
-        self.message = message
+    enum CodingKeys: String, CodingKey {
+        case status
+        case requestId
+        case timestamp
+        case samplesReceived
+    }
+    
+    init(status: String, requestId: String? = nil, timestamp: String, samplesReceived: Int) {
+        self.status = status
+        self.requestId = requestId
         self.timestamp = timestamp
+        self.samplesReceived = samplesReceived
     }
 }

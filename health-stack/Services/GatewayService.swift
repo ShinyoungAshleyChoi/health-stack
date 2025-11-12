@@ -56,11 +56,12 @@ class GatewayService: GatewayServiceProtocol {
             }
         }
         
+        // Create response compatible with server format
         return SyncResponse(
-            success: totalFailed == 0,
-            syncedCount: totalSynced,
-            failedCount: totalFailed,
-            message: totalFailed == 0 ? "All data synced successfully" : "Some data failed to sync"
+            status: totalFailed == 0 ? "success" : "partial_failure",
+            requestId: nil,
+            timestamp: ISO8601DateFormatter().string(from: Date()),
+            samplesReceived: totalSynced
         )
     }
     
