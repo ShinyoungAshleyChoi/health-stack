@@ -11,6 +11,23 @@ struct SyncResponse: Codable {
     let timestamp: String
     let samplesReceived: Int
     
+    // Computed properties for backward compatibility
+    var success: Bool {
+        return status.lowercased() == "success"
+    }
+    
+    var syncedCount: Int {
+        return samplesReceived
+    }
+    
+    var failedCount: Int {
+        return success ? 0 : samplesReceived
+    }
+    
+    var message: String? {
+        return success ? "All data synced successfully" : "Sync failed"
+    }
+    
     enum CodingKeys: String, CodingKey {
         case status
         case requestId
@@ -24,4 +41,4 @@ struct SyncResponse: Codable {
         self.timestamp = timestamp
         self.samplesReceived = samplesReceived
     }
-}
+

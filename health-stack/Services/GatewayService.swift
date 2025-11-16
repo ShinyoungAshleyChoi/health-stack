@@ -47,11 +47,9 @@ class GatewayService: GatewayServiceProtocol {
         for batch in batches {
             do {
                 let response = try await sendBatchWithRetry(batch: batch, config: config)
-                totalSynced += response.syncedCount
-                totalFailed += response.failedCount
+
             } catch {
                 logger.error("Failed to send batch: \(error.localizedDescription)")
-                totalFailed += batch.count
                 throw error
             }
         }
@@ -147,7 +145,6 @@ class GatewayService: GatewayServiceProtocol {
                 responseType: SyncResponse.self
             )
             
-            logger.info("Batch sent successfully: \(response.syncedCount) synced")
             return response
         } catch let error as GatewayError {
             logger.error("Gateway error: \(error.localizedDescription)")
