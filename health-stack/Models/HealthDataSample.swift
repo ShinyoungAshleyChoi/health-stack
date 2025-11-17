@@ -16,6 +16,8 @@ struct HealthDataSample: Identifiable, Codable {
     let metadata: [String: String]?
     var isSynced: Bool
     let createdAt: Date
+    let timezone: String
+    let timezoneOffset: Int
     
     init(
         id: UUID = UUID(),
@@ -27,7 +29,9 @@ struct HealthDataSample: Identifiable, Codable {
         sourceBundle: String? = nil,
         metadata: [String: String]? = nil,
         isSynced: Bool = false,
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        timezone: String? = nil,
+        timezoneOffset: Int? = nil
     ) {
         self.id = id
         self.type = type
@@ -39,5 +43,10 @@ struct HealthDataSample: Identifiable, Codable {
         self.metadata = metadata
         self.isSynced = isSynced
         self.createdAt = createdAt
+        
+        // Capture timezone at the time of sample creation
+        let currentTimeZone = TimeZone.current
+        self.timezone = timezone ?? currentTimeZone.identifier
+        self.timezoneOffset = timezoneOffset ?? (currentTimeZone.secondsFromGMT() / 60)
     }
 }
